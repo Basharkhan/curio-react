@@ -16,12 +16,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/post/:id" element={<PostDetails />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
+        <Route path="/register" element={<Register />} />        
+        <Route path="/dashboard" element={<Dashboard />} />        
       </Routes>
     </Router>
   );
