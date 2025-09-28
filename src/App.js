@@ -1,25 +1,41 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import './App.css';
-import Home from './pages/Home';
-import PostDetails from './pages/PostDetail';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
-import Navbar from "./components/Navbar";
+// src/App.jsx
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './pages/public/Login';
+import Register from './pages/public/Register';
+
+// Simple home component for now
+const Home = () => {
+  const { user, logout } = useAuth();
+  
+  return (
+    <div>
+      <h1>Welcome to Curio Blog</h1>
+      {user ? (
+        <div>
+          <p>Hello, {user.fullName} ({user.role})</p>
+          <button onClick={logout}>Logout</button>
+        </div>
+      ) : (
+        <p>Please login to continue</p>
+      )}
+    </div>
+  );
+};
 
 function App() {
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/post/:id" element={<PostDetails />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />        
-        <Route path="/dashboard" element={<Dashboard />} />        
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
