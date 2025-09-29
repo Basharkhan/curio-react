@@ -4,23 +4,30 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/public/Login';
 import Register from './pages/public/Register';
+import { Home } from './pages/public/Home';
+import { Layout } from './components/common/Layout';
 
 // Simple home component for now
-const Home = () => {
-  const { user, logout } = useAuth();
+const ProtectedRoutes = () => {
+  const { isAuthenticated } = useAuth();
   
-  return (
-    <div>
-      <h1>Welcome to Curio Blog</h1>
-      {user ? (
-        <div>
-          <p>Hello, {user.fullName} ({user.role})</p>
-          <button onClick={logout}>Logout</button>
-        </div>
-      ) : (
-        <p>Please login to continue</p>
+  return (    
+    <Routes>
+      {/* public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />      
+      
+      {/* protected routes */}
+      {isAuthenticated && (
+        <>
+          <Route path="/dashboard" element={<div>Dashboard</div>} />
+        </>
       )}
-    </div>
+
+      {/* Catch all - redirect to home */}
+      <Route path="*" element={<Home />} />
+    </Routes>
   );
 };
 
@@ -28,12 +35,9 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+        <Layout>
+          <ProtectedRoutes />
+        </Layout>
       </Router>
     </AuthProvider>
   );
