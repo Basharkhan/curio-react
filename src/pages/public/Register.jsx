@@ -3,10 +3,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Paper } from '@mui/material';
+import toast from 'react-hot-toast';
 
 const Register = () => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  const { register, handleSubmit, formState: { errors }, watch } = useForm({mode: 'onBlur'});
   const { register: registerUser, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -18,89 +18,105 @@ const Register = () => {
       alert('Registration successful! Please login.');
       navigate('/login');
     } else {
-      alert(result.error);
+      toast.error(result.error);
     }
   };
 
   return (
-    <Box 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="100vh"
-      p={3}
-    >
-      <Paper sx={{ p: 4, maxWidth: 400, width: '100%' }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Register
-        </Typography>
-        
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            fullWidth
-            label="Full Name"
-            margin="normal"
-            {...register('fullName', { 
-              required: 'Full name is required',
-              minLength: {
-                value: 2,
-                message: 'Name must be at least 2 characters'
-              }
-            })}
-            error={!!errors.fullName}
-            helperText={errors.fullName?.message}
-          />
-          
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            margin="normal"
-            {...register('email', { 
-              required: 'Email is required',
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: 'Invalid email address'
-              }
-            })}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-          />
-          
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            margin="normal"
-            {...register('password', { 
-              required: 'Password is required',
-              minLength: {
-                value: 6,
-                message: 'Password must be at least 6 characters'
-              }
-            })}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-          />
-          
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3 }}
-            disabled={loading}
-          >
-            {loading ? 'Registering...' : 'Register'}
-          </Button>
-        </form>
-        
-        <Box mt={2} textAlign="center">
-          <Typography variant="body2">
-            Already have an account? <Link to="/login">Login here</Link>
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md bg-base-100 p-8 rounded-xl shadow-md">
+          <h2 className="text-3xl font-bold text-primary mb-6 text-center">
+            Register
+          </h2>
+
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+            {/* Full Name */}
+            <div className="flex flex-col">
+              <label htmlFor="fullName" className="mb-2 font-medium text-text">
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                placeholder="John Doe"
+                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.fullName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
+                }`}
+                {...register('fullName', {
+                  required: 'Name is required',
+                })}
+                autoComplete="new-name"
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div className="flex flex-col">
+              <label htmlFor="email" className="mb-2 font-medium text-text">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="you@example.com"
+                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
+                }`}
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: 'Invalid email address',
+                  },
+                })}
+                autoComplete="new-email"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col">
+              <label htmlFor="password" className="mb-2 font-medium text-text">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                placeholder="********"
+                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                  errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
+                }`}
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 6,
+                    message: 'Password must be at least 6 characters',
+                  },
+                })}
+                autoComplete="new-password"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+             {/* Register Button */}
+            <button
+              type="submit"
+              className="w-full py-2 px-4 bg-primary text-base-100 font-semibold rounded-lg hover:bg-secondary transition-colors"
+            >
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
+   
   );
 };
 
