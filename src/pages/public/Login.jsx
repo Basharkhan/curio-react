@@ -3,6 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({mode: 'onBlur'});
@@ -12,9 +13,10 @@ const Login = () => {
   const onSubmit = async (data) => {
     const result = await login(data);
     if (result.success) {
+      toast.success('Login successful!');
       navigate('/');
-    } else {
-      alert(result.error);
+    } else {      
+      toast.error(`Login failed: ${result.error}`);
     }
   };
 

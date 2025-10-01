@@ -15,7 +15,7 @@ const Register = () => {
   const onSubmit = async (data) => {
     const result = await registerUser(data);
     if (result.success) {
-      alert('Registration successful! Please login.');
+      toast.success('Registration successful! Please login.');
       navigate('/login');
     } else {
       toast.error(result.error);

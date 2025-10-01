@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Header = () => {
-    const { user, logout, isAuthenticated } = useAuth();
+    const { logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();    
     
     return (
@@ -18,26 +18,30 @@ export const Header = () => {
 
                         <div className="hidden w-full md:block md:w-auto" id="navbar-default">
                             <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-base-100 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                                
-                                <li>
-                                    <a
-                                        href="/login"
-                                        className="block py-2 px-3 text-base-100 bg-primary rounded-sm md:bg-transparent md:text-primary md:p-0 dark:text-white md:dark:text-secondary"
-                                        aria-current="page"
-                                    >
-                                        Login
-                                    </a>
-                                </li>
+                                {
+                                    !isAuthenticated() && (
+                                        <>
+                                            <li>
+                                                <a
+                                                    href="/login"
+                                                    className="block py-2 px-3 text-base-100 bg-primary rounded-sm md:bg-transparent md:text-primary md:p-0 dark:text-white md:dark:text-secondary"
+                                                    aria-current="page"
+                                                >
+                                                    Login
+                                                </a>
+                                            </li>
 
-                                <li>
-                                    <a
-                                        href="/register"
-                                        className="block py-2 px-3 text-text rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0 dark:text-white md:dark:hover:text-secondary dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                                    >
-                                        Registration
-                                    </a>
-                                </li>
-
+                                            <li>
+                                                <a
+                                                    href="/register"
+                                                    className="block py-2 px-3 text-text rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-primary md:p-0 dark:text-white md:dark:hover:text-secondary dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                                                >
+                                                    Registration
+                                                </a>
+                                            </li>
+                                        </>
+                                    )
+                                }                                
                             </ul>
                         </div>
                     </div>
