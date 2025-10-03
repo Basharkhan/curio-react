@@ -3,6 +3,8 @@ import { tagServive } from "../../../../services/tagService";
 import { Delete, Edit, Plus, Search } from "lucide-react";
 import { TagFormModal } from "./TagFormModal";
 import { toast } from "react-hot-toast";
+import ConfirmModal from "../../../../components/common/ConfirmModal";
+import Pagination from "../../../../components/common/Pagination";
 
 export const TagList = () => {
   const [tags, setTags] = useState([]);
@@ -10,17 +12,33 @@ export const TagList = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTag, setEditTag] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [pageSize, setPageSize] = useState(10); // page size state
 
   // Fetch tags on mount
   useEffect(() => {
-    fetchTags();
-  }, []);
+    fetchTags(page, pageSize, searchInput);
+  }, [page, pageSize]);
 
-  const fetchTags = async () => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchTags(0, pageSize, searchInput); // reset to page 0 on new search
+    }, 200); // adjust debounce time if needed
+
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const fetchTags = async (page=0, size=pageSize, searchInput="") => {
     try {
       setLoading(true);
-      const response = await tagServive.getAllTags();
-      setTags(response.data.data);
+      const response = await tagServive.getAllTags(page, size, searchInput);      
+      
+      setTags(response.data.data.content);
+      setPage(response.data.data.number);
+      setTotalPages(response.data.data.totalPages);
     } catch (err) {
       setError("Failed to fetch tags");
       toast.error("Failed to fetch tags");
@@ -44,16 +62,14 @@ export const TagList = () => {
   // Save or update tag
   const handleSave = async (data) => {
     try {
-      if (editTag) {
-        console.log(data);
-        
+      if (editTag) {        
         await tagServive.updateTag(editTag.id, { name: data.name });
         toast.success("Tag updated successfully!");
       } else {
         await tagServive.createTag(data);
         toast.success("Tag created successfully!");
       }
-      fetchTags();
+      fetchTags(page);
       closeModal();
     } catch (err) {
       console.error(err);
@@ -62,16 +78,19 @@ export const TagList = () => {
   };
 
   // Delete tag
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this tag?")) return;
-    try {
-      await tagServive.deleteTag(id);
-      toast.success("Tag deleted successfully!");
-      fetchTags();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete tag");
-    }
+  const handleDelete = async () => {
+      if (!confirmDeleteId) return;
+      const toastId = toast.loading("Deleting tag...");
+      try {
+        await tagServive.deleteTag(confirmDeleteId);
+        toast.success("Tag deleted successfully!", { id: toastId });
+        fetchTags();
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to delete tag", { id: toastId });
+      } finally {
+        setConfirmDeleteId(null); // close modal
+      }
   };
 
   const closeModal = () => {
@@ -100,7 +119,7 @@ export const TagList = () => {
       {/* Header: New Tag + Search */}
       <div className="flex justify-between items-center mb-6">
         <button
-          className="btn bg-primary text-white flex items-center gap-2 px-2 py-1 rounded hover:bg-secondary"
+          className="btn bg-primary text-white flex items-center gap-2 px-3 py-1 rounded hover:bg-secondary uppercase"
           onClick={openNewTagModal}
         >
           <Plus className="w-4 h-4" /> New Tag
@@ -111,7 +130,11 @@ export const TagList = () => {
           <input
             type="text"
             placeholder="Search tags..."
-            className="input input-bordered w-full max-w-xs pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
+            className="input input-bordered w-full max-w-xs pl-10 pr-4 py-1 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value);              
+            }}            
           />
         </div>
       </div>
@@ -145,7 +168,7 @@ export const TagList = () => {
                   </button>
                   <button
                     className="btn btn-sm btn-error text-white"
-                    onClick={() => handleDelete(tag.id)}
+                    onClick={() => setConfirmDeleteId(tag.id)}
                   >
                     <Delete className="w-5 h-5 text-red-500" />
                   </button>
@@ -154,7 +177,12 @@ export const TagList = () => {
             ))}
           </tbody>
         </table>
-      </div>
+         <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+      </div>     
 
       {/* Tag Modal */}
       <TagFormModal
@@ -162,6 +190,15 @@ export const TagList = () => {
         onClose={closeModal}
         onSave={handleSave}
         initialData={editTag}
+      />
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={!!confirmDeleteId}
+        title="Delete Tag"
+        message="Are you sure you want to delete this tag?"
+        onConfirm={handleDelete}
+        onClose={() => setConfirmDeleteId(null)}
       />
     </div>
   );

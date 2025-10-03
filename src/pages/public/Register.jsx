@@ -25,9 +25,9 @@ const Register = () => {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-md bg-base-100 p-8 rounded-xl shadow-md">
-          <h2 className="text-3xl font-bold text-primary mb-6 text-center">
-            Register
+        <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md border-t-2">
+          <h2 className="text-xl font-bold text-text mb-5">
+            Register you account
           </h2>
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
@@ -40,7 +40,7 @@ const Register = () => {
                 type="text"
                 id="fullName"
                 placeholder="John Doe"
-                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.fullName ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
                 }`}
                 {...register('fullName', {
@@ -62,7 +62,7 @@ const Register = () => {
                 type="email"
                 id="email"
                 placeholder="you@example.com"
-                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
                 }`}
                 {...register('email', {
@@ -88,7 +88,7 @@ const Register = () => {
                 type="password"
                 id="password"
                 placeholder="********"
-                className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
                 }`}
                 {...register('password', {
@@ -108,7 +108,7 @@ const Register = () => {
              {/* Register Button */}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-primary text-base-100 font-semibold rounded-lg hover:bg-secondary transition-colors"
+              className="w-full px-4 py-1 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors"
             >
               Register
             </button>

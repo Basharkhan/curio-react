@@ -22,10 +22,10 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md bg-base-100 p-8 rounded-xl shadow-md border-t-2">
-        <h2 className="text-2xl font-bold text-primary mb-6 text-center">
-          Login
-        </h2>
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md border-t-2">
+        <h1 className="text-xl font-bold text-text mb-5">
+            Sign in to your account
+        </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           {/* Email */}
@@ -36,7 +36,7 @@ const Login = () => {
             <input
               type="email"
               id="email"
-              placeholder="you@example.com"
+              placeholder="john@example.com"
               className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
                 errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
               }`}
@@ -85,7 +85,7 @@ const Login = () => {
             type="submit"
             className="w-full px-4 py-1 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors"
           >
-            Login
+            Sign In
           </button>
         </form>
       </div>
