@@ -28,13 +28,13 @@ export const TagList = () => {
     fetchTags(page, pageSize, searchInput);
   }, [page, pageSize]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchTags(0, pageSize, searchInput); // reset to page 0 on new search
-    }, 200); // adjust debounce time if needed
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     fetchTags(0, pageSize, searchInput); // reset to page 0 on new search
+  //   }, 200); // adjust debounce time if needed
 
-    return () => clearTimeout(timeout);
-  }, [searchInput]);
+  //   return () => clearTimeout(timeout);
+  // }, [searchInput]);
 
   const fetchTags = async (page=0, size=pageSize, searchInput="") => {
     try {
