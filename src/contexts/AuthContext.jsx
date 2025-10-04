@@ -17,14 +17,28 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user");
+        const checkAuth = async() => {
+            const storedToken = localStorage.getItem("token");
+            if(!storedToken) {
+                setLoading(false);
+                return;
+            }
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+            try{
+                const response = await authService.currentUser();
+                
+                setUser(response.data.data);
+                setToken(storedToken);
+                localStorage.setItem("user", JSON.stringify(response.data.data));
+            } catch(error) {
+                console.log("Got an error: " + error);                
+                logout();
+            } finally {
+                setLoading(false);
+            }
         }
-        setLoading(false);
+
+        checkAuth();
     }, []);
 
     const login = async (loginData) => {

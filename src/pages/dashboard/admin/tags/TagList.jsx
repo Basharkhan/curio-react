@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { tagServive } from "../../../../services/tagService";
 import { Delete, Edit, Plus, Search } from "lucide-react";
 import { TagFormModal } from "./TagFormModal";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../../../components/common/ConfirmModal";
 import Pagination from "../../../../components/common/Pagination";
+import { useDebounce } from "../../../../hooks/useDebounce";
 
 export const TagList = () => {
   const [tags, setTags] = useState([]);
@@ -17,6 +18,10 @@ export const TagList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [pageSize, setPageSize] = useState(10); // page size state
+  const searchInputRef = useRef(null);
+
+  // Debounce the search input with 300ms delay
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   // Fetch tags on mount
   useEffect(() => {
