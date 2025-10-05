@@ -8,7 +8,6 @@ import Login from './pages/public/Login';
 import Register from './pages/public/Register';
 import { TagList } from './pages/dashboard/admin/tags/TagList';
 import { PtotectedRoute } from './components/common/PtotectedRoute';
-import { CategoryList } from './pages/dashboard/admin/categories/CategoryList';
 
 function App() {
   return (
@@ -28,15 +27,7 @@ function App() {
                     <TagList />
                   </PtotectedRoute>
                 }
-              />
-              <Route 
-                path="/admin/categories"
-                element={
-                  <PtotectedRoute requireAdmin={true}>
-                    <CategoryList />
-                  </PtotectedRoute>
-                }
-              />
+              />              
           </Routes>            
         </Layout>
       </Router>

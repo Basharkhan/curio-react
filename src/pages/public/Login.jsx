@@ -1,12 +1,12 @@
-// src/pages/public/Login.jsx
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({mode: 'onBlur'});
+  const { register, handleSubmit, formState: { errors } } = useForm({ mode: 'onBlur' });
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -21,75 +21,79 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-md border-t-2">
-        <h1 className="text-xl font-bold text-text mb-5">
-            Sign in to your account
-        </h1>
+    <Container className="min-vh-100 d-flex justify-content-center align-items-center py-5">
+      <Row className="w-100 justify-content-center">
+        <Col xs={12} md={6} lg={5}>
+          <Card className="shadow-sm border-top border-primary rounded-3">
+            <Card.Body className="p-4">
+              <h2 className="mb-4 text-primary fw-bold text-center">
+                Sign in to your account
+              </h2>
 
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-          {/* Email */}
-          <div className="flex flex-col">
-            <label htmlFor="email" className="mb-2 font-medium text-text">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="john@example.com"
-              className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
-              }`}
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Invalid email address',
-                },
-              })}
-              autoComplete="new-email"
-            />
-             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
+              <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+                {/* Email */}
+                <Form.Group className="mb-3" controlId="email">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    placeholder="john@example.com"
+                    isInvalid={!!errors.email}
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Invalid email address',
+                      },
+                    })}
+                    autoComplete="new-email"
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-          {/* Password */}
-          <div className="flex flex-col">
-            <label htmlFor="password" className="mb-2 font-medium text-text">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="********"
-              className={`px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'
-              }`}
-              {...register('password', {
-                required: 'Password is required',
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters',
-                },
-              })}
-              autoComplete="new-password"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-          </div>
+                {/* Password */}
+                <Form.Group className="mb-4" controlId="password">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="********"
+                    isInvalid={!!errors.password}
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters',
+                      },
+                    })}
+                    autoComplete="new-password"
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.password?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            className="w-full px-4 py-1 bg-primary text-white font-semibold rounded-lg hover:bg-secondary transition-colors"
-          >
-            Sign In
-          </button>
-        </form>
-      </div>
-    </div>
+                {/* Login Button */}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-100 fw-semibold"
+                  disabled={loading}
+                >
+                  {loading ? 'Signing In...' : 'Sign In'}
+                </Button>
+              </Form>
+
+              <div className="mt-3 text-center">
+                <small>
+                  Don’t have an account? <Link to="/register" className="text-primary">Register</Link>
+                </small>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

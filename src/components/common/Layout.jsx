@@ -1,20 +1,24 @@
 import React from 'react'
-import { Header } from './Header'
 import { useAuth } from '../../contexts/AuthContext';
 import { Sidebar } from './Sidebar';
+import Header from './Header';
 
 export const Layout = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="d-flex flex-column min-vh-100">
       <Header />
-     <div className="flex flex-1">
+     <div className="d-flex flex-grow-1">
         {/* Show sidebar only when authenticated */}
-        {isAuthenticated() && <Sidebar />}
+        {isAuthenticated() && (
+          <aside className="flex-shrink-0">
+            <Sidebar />
+          </aside>            
+        )}
         
         {/* Main content */}
-        <main className="flex-1">
+        <main className="flex-grow-1 p-3">
           {children}
         </main>
       </div>
