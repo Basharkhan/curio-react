@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAuth } from '../../contexts/AuthContext';
-import { Sidebar } from './Sidebar';
 import Header from './Header';
+import Sidebar from "./Sidebar";
 
 export const Layout = ({ children }) => {
   const { isAuthenticated } = useAuth();

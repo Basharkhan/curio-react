@@ -120,91 +120,105 @@ export const TagList = () => {
   }
 
   return (
-    <div className="p-10 m-10 shadow-lg space-y-6">
-      {/* Header: New Tag + Search */}
-      <div className="flex justify-between items-center mb-6">
-        <button
-          className="btn bg-primary text-white flex items-center gap-2 px-3 py-1 rounded hover:bg-secondary uppercase"
-          onClick={openNewTagModal}
-        >
-          <Plus className="w-4 h-4" /> New Tag
-        </button>
+      <div className="p-10 m-10 shadow-lg bg-white rounded-lg space-y-6">
+        {/* Header: New Tag + Search */}
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-secondary transition-colors"
+            onClick={openNewTagModal}
+          >
+            <Plus className="w-4 h-4" /> New Tag
+          </button>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search tags..."
-            className="input input-bordered w-full max-w-xs pl-10 pr-4 py-1 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary"
-            value={searchInput}
-            onChange={(e) => {
-              setSearchInput(e.target.value);              
-            }}            
-          />
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search tags..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* Tags Table */}
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-            <tr>
-              <th className="px-6 py-3">ID</th>
-              <th className="px-6 py-3">Name</th>
-              <th className="px-6 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tags.map((tag, index) => (
-              <tr
-                key={tag.id}
-                className={`border-b hover:bg-gray-50 ${
-                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                }`}
-              >
-                <td className="px-6 py-4 font-mono">{tag.id}</td>
-                <td className="px-6 py-4">{tag.name}</td>
-                <td className="px-6 py-4 text-right flex justify-end gap-2">
-                  <button
-                    className="btn btn-sm btn-outline btn-primary"
-                    onClick={() => openEditTagModal(tag)}
-                  >
-                    <Edit className="w-5 h-5" />
-                  </button>
-                  <button
-                    className="btn btn-sm btn-error text-white"
-                    onClick={() => setConfirmDeleteId(tag.id)}
-                  >
-                    <Delete className="w-5 h-5 text-red-500" />
-                  </button>
-                </td>
+        {/* Tags Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left border border-gray-200 rounded-lg">
+            <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
+              <tr>
+                <th className="px-6 py-3 w-20">ID</th>
+                <th className="px-6 py-3">Name</th>
+                <th className="px-6 py-3 text-end w-40">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-         <Pagination
-            page={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-      </div>     
+            </thead>
+            <tbody>
+              {tags.length > 0 ? (
+                tags.map((tag, index) => (
+                  <tr
+                    key={tag.id}
+                    className={`border-t hover:bg-gray-50 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    }`}
+                  >
+                    <td className="px-6 py-4 font-mono">{tag.id}</td>
+                    <td className="px-6 py-4 capitalize">{tag.name}</td>
+                    <td className="px-6 py-4 text-end">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          className="btn btn-sm btn-outline btn-primary flex items-center gap-1"
+                          onClick={() => openEditTagModal(tag)}
+                        >
+                          <Edit className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline btn-error flex items-center gap-1"
+                          onClick={() => setConfirmDeleteId(tag.id)}
+                        >
+                          <Delete className="w-4 h-4" /> Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="3"
+                    className="text-center py-6 text-gray-500 italic bg-gray-50"
+                  >
+                    No tags found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
-      {/* Tag Modal */}
-      <TagFormModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSave={handleSave}
-        initialData={editTag}
-      />
+          {/* Pagination */}
+          <div className="mt-4 flex justify-center">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </div>
+        </div>
 
-      {/* Confirm Modal */}
-      <ConfirmModal
-        isOpen={!!confirmDeleteId}
-        title="Delete Tag"
-        message="Are you sure you want to delete this tag?"
-        onConfirm={handleDelete}
-        onClose={() => setConfirmDeleteId(null)}
-      />
-    </div>
-  );
+        {/* Modals */}
+        <TagFormModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSave={handleSave}
+          initialData={editTag}
+        />
+
+        <ConfirmModal
+          isOpen={!!confirmDeleteId}
+          title="Delete Tag"
+          message="Are you sure you want to delete this tag?"
+          onConfirm={handleDelete}
+          onClose={() => setConfirmDeleteId(null)}
+        />
+      </div>
+    );
 };
