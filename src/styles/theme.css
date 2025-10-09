@@ -1,8 +1,0 @@
-:root {
-  --primary: #1a73e8;       /* links, buttons */
-  --secondary: #555555;     /* secondary text */
-  --text-primary: #222222;  /* main text */
-  --text-muted: #666666;    /* meta info, small notes */
-  --background: #ffffff;    /* navbar and page background */
-  --accent: #f4f4f4;        /* subtle highlights, borders */
-}

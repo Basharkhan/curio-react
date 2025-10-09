@@ -5,6 +5,6 @@ export const categoryService = {
     // getTagById: (id) => API.get(`/tags/${id}`),
     createCategory: (data) => API.post('/categories', data),
     updateCategory: (id, data) => API.patch(`/categories/${id}`, data),
-    // deleteTag: (id) => API.delete(`/tags/${id}`),
+    deleteCategory: (id) => API.delete(`/categories/${id}`),
     // getPostsByTag: (tagId) => API.get(`/tags/${tagId}/posts`),
 }

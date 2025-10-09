@@ -4,6 +4,9 @@ import { categoryService } from "../../../../services/categoryService";
 import toast from "react-hot-toast";
 import { Edit, Edit3, Trash, Trash2 } from "lucide-react";
 import { CategoryFormModal } from "./CategoryFormModal";
+import { ConfirmDeleteModal } from "../../../../components/common/ConfirmDeleteModal";
+import Pagination from "../../../../components/common/Pagination";
+import "../../../../styles/global.css";
 
 export const CategoryList = () => {
   const [categories, setCategories] = useState([]);
@@ -14,12 +17,16 @@ export const CategoryList = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState("");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const searchInputRef = useRef(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    fetchCategories(page, pageSize, searchInput);
+    const delayDebounce = setTimeout(() => {
+      fetchCategories(page, pageSize, searchInput);  
+    }, 500);
+    
+    return () => clearTimeout(delayDebounce);
   }, [page, pageSize, searchInput]);
 
   const fetchCategories = async (page, size = pageSize, search = searchInput) => {
@@ -47,12 +54,24 @@ export const CategoryList = () => {
     setIsModalOpen(true);
   }
 
+   const handleDelete = async () => {
+      if (!confirmDeleteId) return;      
+      try {
+        await categoryService.deleteCategory(confirmDeleteId);        
+        fetchCategories();
+      } catch (err) {
+        console.error(err);        
+      } finally {
+        setConfirmDeleteId(null); // close modal
+      }
+  };
+
   return (
     <Container className="py-4">
       {/* Header Row */}
       <Row className="align-items-center mb-4">
         <Col>
-          <Button variant="primary" onClick={handleAdd}>
+          <Button className="btn-primary-custom" onClick={handleAdd}>
             + Add Category
           </Button>
         </Col>
@@ -61,7 +80,10 @@ export const CategoryList = () => {
             type="text"
             placeholder="Search categories..."
             value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              setPage(0);
+            }}
             ref={searchInputRef}
           />
         </Col>
@@ -111,6 +133,15 @@ export const CategoryList = () => {
               </tbody>
             </Table>
           )}
+
+          {/* Pagination */}
+          <div className="mt-4 flex justify-center">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+            />
+          </div>          
         </Col>
       </Row>
 
@@ -121,6 +152,13 @@ export const CategoryList = () => {
         onSuccess={() => fetchCategories()}
         selectedCategory={selectedCategory}
       />    
+
+      <ConfirmDeleteModal
+        show={!!confirmDeleteId}
+        onHide={() => setConfirmDeleteId(null)}
+        itemName="category"
+        onConfirm={handleDelete}
+      />
     </Container>
   );
 };

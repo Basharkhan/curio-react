@@ -1,39 +1,42 @@
 // src/components/common/Pagination.jsx
 import React from "react";
+import { Pagination as BSPagination } from "react-bootstrap";
 
 export default function Pagination({ page, totalPages, onPageChange }) {
-    if (totalPages <= 1) return null; // No pagination if only 1 page
-   
-    return (
-        <div className="join mt-6 flex justify-center gap-x-2">
-            {/* Previous */}
-            <button
-                className="join-item btn"
-                disabled={page === 0}
-                onClick={() => onPageChange(page - 1)}
-            >
-                «
-            </button>
+  if (totalPages <= 1) return null; // No pagination if only one page
 
-            {/* Page numbers */}
-            {[...Array(totalPages)].map((_, i) => (
-                <button
-                key={i}
-                className={`join-item btn ${i === page ? "btn-active text-primary" : ""}`}
-                onClick={() => onPageChange(i)}
-                >
-                {i + 1}
-                </button>
-            ))}
+  const handlePrev = () => {
+    if (page > 0) onPageChange(page - 1);
+  };
 
-            {/* Next */}
-            <button
-                className="join-item btn"
-                disabled={page + 1 >= totalPages}
-                onClick={() => onPageChange(page + 1)}
-            >
-                »
-            </button>
-        </div>
-    );
+  const handleNext = () => {
+    if (page + 1 < totalPages) onPageChange(page + 1);
+  };
+
+  return (
+    <div className="d-flex justify-content-center mt-4">
+      <BSPagination>
+        <BSPagination.Prev onClick={handlePrev} disabled={page === 0}>
+          «
+        </BSPagination.Prev>
+
+        {[...Array(totalPages)].map((_, i) => (
+          <BSPagination.Item
+            key={i}
+            active={i === page}
+            onClick={() => onPageChange(i)}
+          >
+            {i + 1}
+          </BSPagination.Item>
+        ))}
+
+        <BSPagination.Next
+          onClick={handleNext}
+          disabled={page + 1 >= totalPages}
+        >
+          »
+        </BSPagination.Next>
+      </BSPagination>
+    </div>
+  );
 }
