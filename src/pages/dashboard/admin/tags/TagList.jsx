@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { tagServive } from "../../../../services/tagService";
-import { Delete, Edit, Plus, Search } from "lucide-react";
+import { Delete, Edit, Plus, Search, Trash2 } from "lucide-react";
 import { TagFormModal } from "./TagFormModal";
 import { toast } from "react-hot-toast";
 import ConfirmModal from "../../../../components/common/ConfirmModal";
 import Pagination from "../../../../components/common/Pagination";
 import { useDebounce } from "../../../../hooks/useDebounce";
+import { Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
+import { ConfirmDeleteModal } from "../../../../components/common/ConfirmDeleteModal";
 
 export const TagList = () => {
   const [tags, setTags] = useState([]);
@@ -19,24 +21,18 @@ export const TagList = () => {
   const [searchInput, setSearchInput] = useState("");
   const [pageSize, setPageSize] = useState(10); // page size state
   const searchInputRef = useRef(null);
-
-  // Debounce the search input with 300ms delay
-  const debouncedSearch = useDebounce(searchInput, 300);
+  const [selectedTag, setSelectedTag] = useState(null);
 
   // Fetch tags on mount
   useEffect(() => {
-    fetchTags(page, pageSize, searchInput);
-  }, [page, pageSize]);
+    const delayDebounce = setTimeout(() => {
+      fetchTags(page, pageSize, searchInput);  
+    }, 500);
+    
+    return () => clearTimeout(delayDebounce);
+  }, [page, pageSize, searchInput]);
 
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     fetchTags(0, pageSize, searchInput); // reset to page 0 on new search
-  //   }, 200); // adjust debounce time if needed
-
-  //   return () => clearTimeout(timeout);
-  // }, [searchInput]);
-
-  const fetchTags = async (page=0, size=pageSize, searchInput="") => {
+  const fetchTags = async (page, size = pageSize, search = searchInput) => {
     try {
       setLoading(true);
       const response = await tagServive.getAllTags(page, size, searchInput);      
@@ -51,174 +47,124 @@ export const TagList = () => {
       setLoading(false);
     }
   };
-
-  // Open modal for new tag
-  const openNewTagModal = () => {
-    setEditTag(null);
+  
+  const handleEdit = async(category) => {    
+    setSelectedTag(category);
     setIsModalOpen(true);
-  };
+  }
 
-  // Open modal for editing existing tag
-  const openEditTagModal = (tag) => {
-    setEditTag(tag);
+  const handleAdd = async() => {
+    setSelectedTag(null);
     setIsModalOpen(true);
-  };
-
-  // Save or update tag
-  const handleSave = async (data) => {
-    try {
-      if (editTag) {        
-        await tagServive.updateTag(editTag.id, { name: data.name });
-        toast.success("Tag updated successfully!");
-      } else {
-        await tagServive.createTag(data);
-        toast.success("Tag created successfully!");
-      }
-      fetchTags(page);
-      closeModal();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save tag");
-    }
-  };
+  }
 
   // Delete tag
   const handleDelete = async () => {
-      if (!confirmDeleteId) return;
-      const toastId = toast.loading("Deleting tag...");
+      if (!confirmDeleteId) return;      
       try {
-        await tagServive.deleteTag(confirmDeleteId);
-        toast.success("Tag deleted successfully!", { id: toastId });
+        await tagServive.deleteTag(confirmDeleteId);        
         fetchTags();
       } catch (err) {
-        console.error(err);
-        toast.error("Failed to delete tag", { id: toastId });
+        console.error(err);        
       } finally {
         setConfirmDeleteId(null); // close modal
       }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditTag(null);
-  };
-
-  if (loading) {
-    return (
-      <div className="p-6 flex justify-center items-center h-32">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 alert alert-error">
-        <span>{error}</span>
-      </div>
-    );
-  }
-
   return (
-      <div className="p-10 m-10 shadow-lg bg-white rounded-lg space-y-6">
-        {/* Header: New Tag + Search */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-          <button
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-secondary transition-colors"
-            onClick={openNewTagModal}
-          >
-            <Plus className="w-4 h-4" /> New Tag
-          </button>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
+      <Container className="py-4">
+        {/* Header Row */}
+        <Row className="align-items-center mb-4">
+          <Col>
+            <Button className="btn-primary-custom" onClick={handleAdd}>
+              + Add Tag
+            </Button>
+          </Col>
+          <Col md={4}>
+            <Form.Control
               type="text"
               placeholder="Search tags..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setPage(0);
+              }}
+              ref={searchInputRef}
             />
-          </div>
-        </div>
+          </Col>
+        </Row>      
 
-        {/* Tags Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left border border-gray-200 rounded-lg">
-            <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
-              <tr>
-                <th className="px-6 py-3 w-20">ID</th>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3 text-end w-40">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tags.length > 0 ? (
-                tags.map((tag, index) => (
-                  <tr
-                    key={tag.id}
-                    className={`border-t hover:bg-gray-50 ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    }`}
-                  >
-                    <td className="px-6 py-4 font-mono">{tag.id}</td>
-                    <td className="px-6 py-4 capitalize">{tag.name}</td>
-                    <td className="px-6 py-4 text-end">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          className="btn btn-sm btn-outline btn-primary flex items-center gap-1"
-                          onClick={() => openEditTagModal(tag)}
-                        >
-                          <Edit className="w-4 h-4" /> Edit
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline btn-error flex items-center gap-1"
-                          onClick={() => setConfirmDeleteId(tag.id)}
-                        >
-                          <Delete className="w-4 h-4" /> Delete
-                        </button>
-                      </div>
-                    </td>
+        {/* Category Table */}
+        <Row>
+          <Col>
+            {loading ? (
+              <div className="text-center py-5">
+                <Spinner animation="border" role="status" />
+              </div>
+            ) : error ? (
+              <p className="text-danger">{error}</p>
+            ) : tags.length === 0 ? (
+              <p>No tags found.</p>
+            ) : (
+              <Table striped hover responsive>
+                <thead>
+                  <tr>                  
+                    <th>Name</th>                 
+                    <th>Actions</th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="3"
-                    className="text-center py-6 text-gray-500 italic bg-gray-50"
-                  >
-                    No tags found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {tags.map((tag, index) => (
+                    <tr key={tag.id}>                   
+                      <td>{tag.name}</td>                    
+                      <td>
+                          <div className="d-flex gap-3 align-items-center">
+                              <Edit
+                                  size={18}
+                                  className="text-secondary"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleEdit(tag)}
+                              />
+                              <Trash2
+                                  size={18}
+                                  className="text-danger"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => setConfirmDeleteId(tag.id)}
+                              />
+                          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
 
-          {/* Pagination */}
-          <div className="mt-4 flex justify-center">
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
-          </div>
-        </div>
+            {/* Pagination */}
+            <div className="mt-4 flex justify-center">
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>          
+          </Col>
+        </Row>
 
-        {/* Modals */}
-        <TagFormModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSave={handleSave}
-          initialData={editTag}
-        />
+       {/* Modal */}
+      <TagFormModal
+        show={isModalOpen}
+        onHide={() => setIsModalOpen(false)}
+        onSuccess={() => fetchTags()}
+        selectedTag={selectedTag}
+      />    
 
-        <ConfirmModal
-          isOpen={!!confirmDeleteId}
-          title="Delete Tag"
-          message="Are you sure you want to delete this tag?"
-          onConfirm={handleDelete}
-          onClose={() => setConfirmDeleteId(null)}
-        />
-      </div>
+
+      <ConfirmDeleteModal
+        show={!!confirmDeleteId}
+        onHide={() => setConfirmDeleteId(null)}
+        itemName="category"
+        onConfirm={handleDelete}
+      />
+      </Container>    
     );
 };

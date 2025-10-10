@@ -58,21 +58,23 @@ const Sidebar = () => {
           {user?.role === "ADMIN" && (
             <>
               <Nav.Item>
-                <Link to="/admin/tags" className={linkClasses("/admin/tags")}>
-                  <Tags size={18} /> Manage Tags
-                </Link>
-              </Nav.Item>
-              <Nav.Item>
                 <Link to="/admin/posts" className={linkClasses("/admin/posts")}>
                   <FileText size={18} /> Posts
                 </Link>
               </Nav.Item>
+              
               <Nav.Item>
                 <Link
                   to="/admin/categories"
                   className={linkClasses("/admin/categories")}
                 >
                   <Grid size={18} /> Categories
+                </Link>
+              </Nav.Item>
+
+              <Nav.Item>
+                <Link to="/admin/tags" className={linkClasses("/admin/tags")}>
+                  <Tags size={18} /> Tags
                 </Link>
               </Nav.Item>
             </>
