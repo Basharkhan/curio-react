@@ -97,7 +97,7 @@ export const PostList = () => {
                                 size={18}
                                 className="text-secondary"
                                 style={{ cursor: "pointer" }}
-                                // onClick={() => handleEdit(post)}
+                                onClick={() => navigate(`/admin/posts/${post.id}/edit`)}
                             />
                             <Trash2
                                 size={18}
