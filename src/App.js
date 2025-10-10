@@ -10,6 +10,7 @@ import { TagList } from './pages/dashboard/admin/tags/TagList';
 import { PtotectedRoute } from './components/common/PtotectedRoute';
 import { CategoryList } from './pages/dashboard/admin/categories/CategoryList';
 import { PostList } from './pages/dashboard/admin/posts/PostList';
+import { PostForm } from './pages/dashboard/admin/posts/PostForm';
 
 function App() {
   return (
@@ -35,6 +36,22 @@ function App() {
                 element={
                   <PtotectedRoute requireAdmin={true}>
                     <PostList />
+                  </PtotectedRoute>
+                }
+              />              
+              <Route 
+                path="/admin/posts/create"
+                element={
+                  <PtotectedRoute requireAdmin={true}>
+                    <PostForm />
+                  </PtotectedRoute>
+                }
+              />              
+              <Route 
+                path="/admin/posts/:id/edit"
+                element={
+                  <PtotectedRoute requireAdmin={true}>
+                    <PostForm />
                   </PtotectedRoute>
                 }
               />              

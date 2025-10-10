@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { postService } from '../../../../services/postService';
 import toast from 'react-hot-toast';
-import { Col, Container, Row, Spinner, Table } from 'react-bootstrap';
+import { Button, Col, Container, Form, Row, Spinner, Table } from 'react-bootstrap';
 import { Edit, Trash2 } from 'lucide-react';
 import Pagination from '../../../../components/common/Pagination';
+import { useNavigate } from 'react-router-dom';
 
 export const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -13,6 +14,8 @@ export const PostList = () => {
   const [searchInput, setSearchInput] = useState("");
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
+  const searchInputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -42,6 +45,27 @@ export const PostList = () => {
 
   return (
     <Container className="py-4">
+            {/* Header Row */}
+      <Row className="align-items-center mb-4">
+        <Col>
+          <Button className="btn-primary-custom" onClick={() => navigate("/admin/posts/create")}>
+            + Add Post
+          </Button>
+        </Col>
+        <Col md={4}>
+          <Form.Control
+            type="text"
+            placeholder="Search post..."
+            value={searchInput}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              setPage(0);
+            }}
+            ref={searchInputRef}
+          />
+        </Col>
+      </Row>      
+
       {/* Category Table */}
       <Row>
         <Col>
