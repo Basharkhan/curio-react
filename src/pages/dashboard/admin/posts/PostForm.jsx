@@ -4,7 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Container, Form, Spinner } from "react-bootstrap";
 import toast from "react-hot-toast";
 import { categoryService } from "../../../../services/categoryService";
-import { postService } from "../../../../services/postService"; // we'll create next
+import { postService } from "../../../../services/postService"; 
+import { tagServive } from "../../../../services/tagService";
 
 export const PostForm = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export const PostForm = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
 
   // Load categories
   useEffect(() => {
@@ -23,6 +25,20 @@ export const PostForm = () => {
         setCategories(response.data.data.content || []);
       } catch (error) {
         toast.error("Failed to load categories");
+      }
+    })();
+  }, []);
+
+  // load tags
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await tagServive.getAllTags();
+        console.log(response);
+        
+        setTags(response.data.data.content || []);
+      } catch (error) {
+        toast.error("Failed to load tags");
       }
     })();
   }, []);
@@ -40,6 +56,7 @@ export const PostForm = () => {
           reset({
             title: post.title,
             content: post.content,
+            status: post.status,
             categoryId: post.categoryId || ""
           });
         } catch (error) {
@@ -104,6 +121,22 @@ export const PostForm = () => {
             />
             <Form.Control.Feedback type="invalid">
               {errors.content?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-4" controlId="status">
+            <Form.Label>Status</Form.Label>
+            <Form.Select
+              {...register("status", { required: "Status is required" })}
+              isInvalid={!!errors.status}
+            >
+              <option value="">Select Category</option>
+              <option value="DRAFT">DRAFT</option>              
+              <option value="PUBLISHED">PUBLISHED</option>              
+              <option value="ARCHIVED">ARCHIVED</option>              
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errors.status?.message}
             </Form.Control.Feedback>
           </Form.Group>
 

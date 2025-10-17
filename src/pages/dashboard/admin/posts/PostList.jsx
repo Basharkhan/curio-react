@@ -83,6 +83,8 @@ export const PostList = () => {
                 <tr>                  
                   <th>Title</th>                 
                   <th>Content</th>                 
+                  <th>Author</th>                 
+                  <th>Status</th>                 
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -91,6 +93,8 @@ export const PostList = () => {
                   <tr key={post.id}>                   
                     <td>{post.title}</td>                    
                     <td>{post.content.substring(0, 40)}</td>                    
+                    <td>{post.authorName}</td>                    
+                    <td>{post.status}</td>                    
                     <td>
                         <div className="d-flex gap-3 align-items-center">
                             <Edit
